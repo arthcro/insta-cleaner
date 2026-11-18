@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Instagram Focus Mode (Ultra Fluide)
 // @namespace    https://github.com/
-// @version      1.4
-// @description  Masquage complet + nettoyage en-tête + rétraction barre Safari
+// @version      1.5
+// @description  Masquage Reels/Feed/Explore + déblocage scroll Safari
 // @match        https://*.instagram.com/*
 // @run-at       document-start
 // ==/UserScript==
@@ -12,14 +12,13 @@
 
     const style = document.createElement('style');
     style.textContent = `
-        /* Masquage Reels, Explore, Feed et en-tête For You */
+        /* Masquage Reels, Explore et Feed */
         a[href*="/reels/"],
         a[href*="/explore/"],
         svg[aria-label="Reels"],
         svg[aria-label="Découvrir"],
         svg[aria-label="Explore"],
         article,
-        header,
         div[data-visualcompletion="loading-state"],
         section main > div > div > div:not(:first-child) {
             display: none !important;
@@ -28,10 +27,12 @@
             overflow: hidden !important;
         }
 
-        /* Hauteur minimale pour forcer la rétraction de la barre Safari */
+        /* Débloquer le scroll de la fenêtre principale pour rétracter Safari */
         html, body {
-            min-height: 115vh !important;
-            overscroll-behavior-y: none !important;
+            height: auto !important;
+            min-height: 120vh !important;
+            overflow-y: auto !important;
+            position: relative !important;
         }
     `;
     document.documentElement.appendChild(style);
@@ -50,9 +51,4 @@
     };
     window.addEventListener('popstate', blockDistractions);
     blockDistractions();
-
-    // Déclenche la rétraction de la barre d'outils au chargement
-    window.addEventListener('load', () => {
-        setTimeout(() => window.scrollTo(0, 50), 300);
-    });
 })();
