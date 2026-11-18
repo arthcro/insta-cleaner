@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Instagram No Reels & No Suggestions (Ultra Light)
+// @name         Instagram Focus (100% CSS Ultra-Rapide)
 // @namespace    https://github.com/
-// @version      1.8.2
-// @description  Masque l'onglet Reels, la barre For you et le carrousel Suggestions en CSS pur
+// @version      2.0
+// @description  Vitesse maximale, 0 JavaScript actif, masque Reels, Suggestions et For You
 // @match        https://*.instagram.com/*
 // @run-at       document-start
 // ==/UserScript==
@@ -12,23 +12,21 @@
 
     const style = document.createElement('style');
     style.textContent = `
-        /* 1. Masque l'onglet Reels */
+        /* 1. Masquer l'onglet Reels */
         a[href="/reels/"],
         svg[aria-label="Reels"] {
             display: none !important;
         }
 
-        /* 2. Masque la barre du haut "For you v" (uniquement sur l'accueil) */
-        header:has(svg[aria-label="Notifications"]),
-        header:has(a[href*="/notifications/"]) {
+        /* 2. Masquer le carrousel horizontal "Suggestions for you" */
+        main div[role="region"],
+        main ul[style*="transform"],
+        div:has(> div > div > ul > li button) {
             display: none !important;
         }
 
-        /* 3. Masque le carrousel horizontal "Suggestions for you" (liste horizontale ul/li sous les Stories) */
-        main ul:has(button) {
-            display: none !important;
-        }
-        div:has(> div > ul > li button) {
+        /* 3. Masquer la barre "For you v" tout en haut de l'accueil */
+        main > div > div > div:first-child:has(svg[aria-label="Notifications"]) {
             display: none !important;
         }
     `;
