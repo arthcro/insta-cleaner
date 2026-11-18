@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Instagram Focus Mode
+// @name         Instagram Focus Mode (Ultra Fluide)
 // @namespace    https://github.com/
-// @version      1.1
-// @description  Supprime les Reels, Explorer et le Feed. Garde uniquement Stories et Messages.
+// @version      1.4
+// @description  Masquage complet + nettoyage en-tête + rétraction barre Safari
 // @match        https://*.instagram.com/*
 // @run-at       document-start
 // ==/UserScript==
@@ -10,36 +10,49 @@
 (function() {
     'use strict';
 
-    // 1. Injection CSS immédiate pour masquer les éléments
     const style = document.createElement('style');
-    style.innerHTML = `
-        /* Masquer les boutons Reels et Explorer dans la barre du bas/côté */
+    style.textContent = `
+        /* Masquage Reels, Explore, Feed et en-tête For You */
         a[href*="/reels/"],
         a[href*="/explore/"],
         svg[aria-label="Reels"],
         svg[aria-label="Découvrir"],
-        svg[aria-label="Explore"] {
+        svg[aria-label="Explore"],
+        article,
+        header,
+        div[data-visualcompletion="loading-state"],
+        section main > div > div > div:not(:first-child) {
             display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            overflow: hidden !important;
         }
 
-        /* Masquer toutes les publications (posts/vidéos) du fil d'actualité */
-        main[role="main"] article {
-            display: none !important;
-        }
-
-        /* Masquer le chargement infini du feed sous la barre des stories */
-        main[role="main"] div[data-visualcompletion="loading-state"] {
-            display: none !important;
+        /* Hauteur minimale pour forcer la rétraction de la barre Safari */
+        html, body {
+            min-height: 115vh !important;
+            overscroll-behavior-y: none !important;
         }
     `;
     document.documentElement.appendChild(style);
 
-    // 2. Sécurité : si tu cliques sur un Reel envoyé en DM, redirection vers la boîte de réception
-    const observer = new MutationObserver(() => {
-        if (window.location.pathname.startsWith('/reels')) {
+    const blockDistractions = () => {
+        const path = window.location.pathname;
+        if (path.startsWith('/reels') || path.startsWith('/explore')) {
             window.location.replace('https://www.instagram.com/direct/inbox/');
         }
-    });
+    };
 
-    observer.observe(document, { subtree: true, childList: true });
+    const pushState = history.pushState;
+    history.pushState = function() {
+        pushState.apply(history, arguments);
+        blockDistractions();
+    };
+    window.addEventListener('popstate', blockDistractions);
+    blockDistractions();
+
+    // Déclenche la rétraction de la barre d'outils au chargement
+    window.addEventListener('load', () => {
+        setTimeout(() => window.scrollTo(0, 50), 300);
+    });
 })();
