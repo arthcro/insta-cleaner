@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Instagram No Reels & No Suggestions (Ultra Light)
 // @namespace    https://github.com/
-// @version      1.8.1
-// @description  Masque l'onglet Reels et les suggestions en CSS pur sans ralentir Instagram
+// @version      1.8.2
+// @description  Masque l'onglet Reels, la barre For you et le carrousel Suggestions en CSS pur
 // @match        https://*.instagram.com/*
 // @run-at       document-start
 // ==/UserScript==
@@ -10,18 +10,25 @@
 (function() {
     'use strict';
 
-    // Injection CSS pure (0 charge CPU, 0 latence au démarrage)
     const style = document.createElement('style');
     style.textContent = `
-        /* Masque l'onglet Reels */
+        /* 1. Masque l'onglet Reels */
         a[href="/reels/"],
         svg[aria-label="Reels"] {
             display: none !important;
         }
 
-        /* Masque le bloc horizontal "Suggestions for you" sous les Stories */
-        main section > div > div > div:has(a[href*="/explore/people/"]),
-        div:has(> div > a[href*="/explore/people/"]) {
+        /* 2. Masque la barre du haut "For you v" (uniquement sur l'accueil) */
+        header:has(svg[aria-label="Notifications"]),
+        header:has(a[href*="/notifications/"]) {
+            display: none !important;
+        }
+
+        /* 3. Masque le carrousel horizontal "Suggestions for you" (liste horizontale ul/li sous les Stories) */
+        main ul:has(button) {
+            display: none !important;
+        }
+        div:has(> div > ul > li button) {
             display: none !important;
         }
     `;
